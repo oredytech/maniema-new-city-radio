@@ -1,6 +1,7 @@
 
 import Navigation from '../components/Navigation';
 import HeroSection from '../components/HeroSection';
+import NewsSection from '../components/NewsSection';
 import AboutSection from '../components/AboutSection';
 import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
@@ -12,6 +13,7 @@ const Index = () => {
       <Navigation />
       <main className="pb-[50px]">
         <HeroSection />
+        <NewsSection />
         <AboutSection />
         <ContactSection />
       </main>
