@@ -81,19 +81,23 @@ const FixedRadioPlayer = () => {
       if (isPlaying) {
         console.log('Radio: Pausing stream...');
         audio.pause();
-        audio.currentTime = 0; // Reset for live stream
+        setIsPlaying(false);
       } else {
         console.log('Radio: Starting stream...');
         setIsLoading(true);
         setIsError(false);
         
-        // Force reload the stream for better reliability
+        // Force reload the stream
+        audio.src = streamUrl + '?t=' + Date.now();
         audio.load();
         
-        const playPromise = audio.play();
-        
-        if (playPromise !== undefined) {
-          await playPromise;
+        try {
+          await audio.play();
+          console.log('Radio: Successfully started playing');
+        } catch (playError) {
+          console.error('Radio: Play error:', playError);
+          setIsLoading(false);
+          setIsError(true);
         }
       }
     } catch (error) {
@@ -146,7 +150,7 @@ const FixedRadioPlayer = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-[50px] bg-gray-900 border-t border-gray-700 backdrop-blur-md z-50">
+    <div className="fixed bottom-0 left-0 right-0 h-[50px] bg-gray-900 border-t border-gray-700 backdrop-blur-md z-50 mb-2">
       <div className="container mx-auto px-4 h-full flex items-center justify-between">
         {/* Radio Info */}
         <div className="flex items-center space-x-3">
@@ -157,20 +161,20 @@ const FixedRadioPlayer = () => {
 
         {/* Player Controls */}
         <div className="flex items-center space-x-4">
-          {/* Play/Pause Button */}
+          {/* Play/Pause Button - Plus visible */}
           <Button
             onClick={togglePlay}
             disabled={isLoading}
             size="sm"
             variant="ghost"
-            className="w-8 h-8 rounded-full text-white hover:bg-white/20 disabled:opacity-50"
+            className="w-10 h-10 rounded-full text-white hover:bg-white/20 disabled:opacity-50 border border-white/20"
           >
             {isLoading ? (
               <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
             ) : isPlaying ? (
-              <Pause className="h-4 w-4" />
+              <Pause className="h-5 w-5" />
             ) : (
-              <Play className="h-4 w-4 ml-0.5" />
+              <Play className="h-5 w-5 ml-0.5" />
             )}
           </Button>
 

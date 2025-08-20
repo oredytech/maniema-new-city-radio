@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Radio, Phone, Info, Newspaper } from 'lucide-react';
+import { Menu, X, Radio, Phone, Info, Newspaper, Play } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const Navigation = () => {
@@ -22,7 +22,7 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-sm border-b border-border">
+    <nav className="fixed top-0 w-full z-50 bg-gray-900 backdrop-blur-sm border-b border-gray-700">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -33,8 +33,8 @@ const Navigation = () => {
               className="h-10 w-auto"
             />
             <div className="hidden sm:block">
-              <h1 className="text-xl font-bold text-gradient">RTCMNC</h1>
-              <p className="text-xs text-muted-foreground">97.4 MHz</p>
+              <h1 className="text-xl font-bold text-white">RTCMNC</h1>
+              <p className="text-xs text-gray-300">97.4 MHz</p>
             </div>
           </Link>
 
@@ -46,8 +46,8 @@ const Navigation = () => {
                 to={item.href}
                 className={`transition-colors font-medium ${
                   isActive(item.href) 
-                    ? 'text-primary' 
-                    : 'text-foreground hover:text-primary'
+                    ? 'text-white' 
+                    : 'text-gray-300 hover:text-white'
                 }`}
               >
                 {item.name}
@@ -55,32 +55,33 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* En Direct Button */}
-          <div className="hidden md:flex items-center space-x-4">
+          {/* En Direct Button - Desktop et Mobile */}
+          <div className="flex items-center space-x-4">
             <Link to="/en-direct">
-              <Button className="gradient-primary hover:scale-105 transition-all duration-300">
-                <Radio className="h-4 w-4 mr-2" />
-                En Direct
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300">
+                <Play className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">En Direct</span>
               </Button>
             </Link>
-          </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsOpen(!isOpen)}
+                className="text-white hover:bg-white/20"
+              >
+                {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-900 border-t border-gray-700">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -89,8 +90,8 @@ const Navigation = () => {
                     to={item.href}
                     className={`flex items-center space-x-3 px-3 py-2 transition-colors ${
                       isActive(item.href)
-                        ? 'text-primary bg-primary/10'
-                        : 'text-foreground hover:text-primary hover:bg-muted'
+                        ? 'text-white bg-white/10'
+                        : 'text-gray-300 hover:text-white hover:bg-white/10'
                     }`}
                     onClick={() => setIsOpen(false)}
                   >
@@ -99,14 +100,6 @@ const Navigation = () => {
                   </Link>
                 );
               })}
-              <Link
-                to="/en-direct"
-                className="flex items-center space-x-3 px-3 py-2 text-primary font-medium"
-                onClick={() => setIsOpen(false)}
-              >
-                <Radio className="h-5 w-5" />
-                <span>En Direct</span>
-              </Link>
             </div>
           </div>
         )}
