@@ -1,23 +1,32 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Radio, Phone, Info } from 'lucide-react';
+import { Menu, X, Radio, Phone, Info, Newspaper } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   const navItems = [
-    { name: 'Accueil', href: '#home', icon: Radio },
-    { name: 'À propos', href: '#about', icon: Info },
-    { name: 'Contact', href: '#contact', icon: Phone },
+    { name: 'Accueil', href: '/', icon: Info },
+    { name: 'Actualités', href: '/actualites', icon: Newspaper },
+    { name: 'À propos', href: '/#about', icon: Info },
+    { name: 'Contact', href: '/#contact', icon: Phone },
   ];
+
+  const isActive = (href: string) => {
+    if (href === '/') return location.pathname === '/';
+    if (href.startsWith('/#')) return location.pathname === '/' && location.hash === href.substring(1);
+    return location.pathname === href;
+  };
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-3">
             <img 
               src="/lovable-uploads/6c5a1a81-d187-4ef3-a865-11492f0b9f9a.png" 
               alt="RTCMNC Logo" 
@@ -27,19 +36,33 @@ const Navigation = () => {
               <h1 className="text-xl font-bold text-gradient">RTCMNC</h1>
               <p className="text-xs text-muted-foreground">97.4 MHz</p>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
-                className="text-foreground hover:text-primary transition-colors font-medium"
+                to={item.href}
+                className={`transition-colors font-medium ${
+                  isActive(item.href) 
+                    ? 'text-primary' 
+                    : 'text-foreground hover:text-primary'
+                }`}
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
+          </div>
+
+          {/* En Direct Button */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Link to="/en-direct">
+              <Button className="gradient-primary hover:scale-105 transition-all duration-300">
+                <Radio className="h-4 w-4 mr-2" />
+                En Direct
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -61,17 +84,29 @@ const Navigation = () => {
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <a
+                  <Link
                     key={item.name}
-                    href={item.href}
-                    className="flex items-center space-x-3 px-3 py-2 text-foreground hover:text-primary transition-colors"
+                    to={item.href}
+                    className={`flex items-center space-x-3 px-3 py-2 transition-colors ${
+                      isActive(item.href)
+                        ? 'text-primary bg-primary/10'
+                        : 'text-foreground hover:text-primary hover:bg-muted'
+                    }`}
                     onClick={() => setIsOpen(false)}
                   >
                     <Icon className="h-5 w-5" />
                     <span>{item.name}</span>
-                  </a>
+                  </Link>
                 );
               })}
+              <Link
+                to="/en-direct"
+                className="flex items-center space-x-3 px-3 py-2 text-primary font-medium"
+                onClick={() => setIsOpen(false)}
+              >
+                <Radio className="h-5 w-5" />
+                <span>En Direct</span>
+              </Link>
             </div>
           </div>
         )}
