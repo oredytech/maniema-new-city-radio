@@ -10,6 +10,7 @@ const RadioPlayer = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState([70]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const streamUrl = "https://stream.zeno.fm/cgxrxyyhjsrtv";
@@ -18,21 +19,57 @@ const RadioPlayer = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handleLoadStart = () => setIsLoading(true);
-    const handleCanPlay = () => setIsLoading(false);
-    const handleError = () => {
+    // Set initial volume
+    audio.volume = volume[0] / 100;
+
+    const handleLoadStart = () => {
+      console.log('Radio Player: Starting to load stream...');
+      setIsLoading(true);
+      setIsError(false);
+    };
+
+    const handleCanPlay = () => {
+      console.log('Radio Player: Stream ready to play');
+      setIsLoading(false);
+      setIsError(false);
+    };
+
+    const handleError = (e: Event) => {
+      console.error('Radio Player: Stream error', e);
       setIsLoading(false);
       setIsPlaying(false);
-      console.error('Erreur de lecture du stream radio');
+      setIsError(true);
+    };
+
+    const handleLoadedData = () => {
+      console.log('Radio Player: Stream data loaded');
+      setIsLoading(false);
+    };
+
+    const handlePlay = () => {
+      console.log('Radio Player: Stream started playing');
+      setIsPlaying(true);
+      setIsLoading(false);
+    };
+
+    const handlePause = () => {
+      console.log('Radio Player: Stream paused');
+      setIsPlaying(false);
     };
 
     audio.addEventListener('loadstart', handleLoadStart);
     audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('loadeddata', handleLoadedData);
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('pause', handlePause);
     audio.addEventListener('error', handleError);
 
     return () => {
       audio.removeEventListener('loadstart', handleLoadStart);
       audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('loadeddata', handleLoadedData);
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('error', handleError);
     };
   }, []);
@@ -43,18 +80,28 @@ const RadioPlayer = () => {
 
     try {
       if (isPlaying) {
+        console.log('Radio Player: Pausing stream...');
         audio.pause();
-        setIsPlaying(false);
+        audio.currentTime = 0; // Reset for live stream
       } else {
+        console.log('Radio Player: Starting stream...');
         setIsLoading(true);
-        await audio.play();
-        setIsPlaying(true);
-        setIsLoading(false);
+        setIsError(false);
+        
+        // Force reload the stream for better reliability
+        audio.load();
+        
+        const playPromise = audio.play();
+        
+        if (playPromise !== undefined) {
+          await playPromise;
+        }
       }
     } catch (error) {
-      console.error('Erreur lors de la lecture:', error);
+      console.error('Radio Player: Error during play/pause:', error);
       setIsLoading(false);
       setIsPlaying(false);
+      setIsError(true);
     }
   };
 
@@ -62,8 +109,10 @@ const RadioPlayer = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    audio.muted = !isMuted;
-    setIsMuted(!isMuted);
+    const newMutedState = !isMuted;
+    audio.muted = newMutedState;
+    setIsMuted(newMutedState);
+    console.log('Radio Player: Mute toggled to', newMutedState);
   };
 
   const handleVolumeChange = (newVolume: number[]) => {
@@ -76,9 +125,25 @@ const RadioPlayer = () => {
     
     if (volumeValue === 0) {
       setIsMuted(true);
+      audio.muted = true;
     } else if (isMuted) {
       setIsMuted(false);
+      audio.muted = false;
     }
+  };
+
+  const getStatusText = () => {
+    if (isError) return "Erreur de connexion - Veuillez réessayer";
+    if (isLoading) return "Connexion en cours...";
+    if (isPlaying) return "🔴 En direct";
+    return "Appuyez pour écouter";
+  };
+
+  const getStatusColor = () => {
+    if (isError) return "text-destructive";
+    if (isLoading) return "text-muted-foreground";
+    if (isPlaying) return "text-rtcmnc-green";
+    return "text-muted-foreground";
   };
 
   return (
@@ -95,7 +160,7 @@ const RadioPlayer = () => {
             onClick={togglePlay}
             disabled={isLoading}
             size="lg"
-            className="w-20 h-20 rounded-full gradient-primary hover:scale-110 transition-all duration-300 animate-pulse-glow"
+            className="w-20 h-20 rounded-full gradient-primary hover:scale-110 transition-all duration-300 animate-pulse-glow disabled:opacity-50"
           >
             {isLoading ? (
               <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-foreground border-t-transparent" />
@@ -138,23 +203,26 @@ const RadioPlayer = () => {
 
         {/* Status */}
         <div className="text-center">
-          <p className="text-sm font-medium">
-            {isLoading ? (
-              "Connexion en cours..."
-            ) : isPlaying ? (
-              <span className="text-rtcmnc-green">🔴 En direct</span>
-            ) : (
-              "Appuyez pour écouter"
-            )}
+          <p className={`text-sm font-medium ${getStatusColor()}`}>
+            {getStatusText()}
           </p>
+          {isError && (
+            <p className="text-xs text-muted-foreground mt-1">
+              Vérifiez votre connexion internet
+            </p>
+          )}
         </div>
       </div>
 
       <audio
         ref={audioRef}
-        src={streamUrl}
         preload="none"
-      />
+        crossOrigin="anonymous"
+      >
+        <source src={streamUrl} type="audio/mpeg" />
+        <source src={streamUrl} type="audio/mp3" />
+        Your browser does not support the audio element.
+      </audio>
     </Card>
   );
 };
