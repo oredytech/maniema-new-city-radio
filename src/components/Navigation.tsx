@@ -1,23 +1,24 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Radio, Phone, Info, Newspaper, Play } from 'lucide-react';
+import { Menu, X, Phone, Info, Newspaper, Play, Pause } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useRadioStore } from '@/stores/radioStore';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { isPlaying, togglePlay } = useRadioStore();
 
   const navItems = [
     { name: 'Accueil', href: '/', icon: Info },
     { name: 'Actualités', href: '/actualites', icon: Newspaper },
-    { name: 'À propos', href: '/#about', icon: Info },
-    { name: 'Contact', href: '/#contact', icon: Phone },
+    { name: 'À propos', href: '/about', icon: Info },
+    { name: 'Contact', href: '/contact', icon: Phone },
   ];
 
   const isActive = (href: string) => {
     if (href === '/') return location.pathname === '/';
-    if (href.startsWith('/#')) return location.pathname === '/' && location.hash === href.substring(1);
     return location.pathname === href;
   };
 
@@ -57,12 +58,24 @@ const Navigation = () => {
 
           {/* En Direct Button - Desktop et Mobile */}
           <div className="flex items-center space-x-4">
-            <Link to="/en-direct">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300">
-                <Play className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">En Direct</span>
+            <div className="flex items-center space-x-2">
+              {/* Mobile: seulement l'icône */}
+              <Button 
+                onClick={togglePlay}
+                className="md:hidden bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300"
+                size="sm"
+              >
+                {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
               </Button>
-            </Link>
+              
+              {/* Desktop: texte + icône */}
+              <Link to="/en-direct" className="hidden md:block">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300">
+                  <Play className="h-4 w-4 mr-2" />
+                  En Direct
+                </Button>
+              </Link>
+            </div>
 
             {/* Mobile menu button */}
             <div className="md:hidden">
@@ -100,6 +113,15 @@ const Navigation = () => {
                   </Link>
                 );
               })}
+              
+              <Link
+                to="/en-direct"
+                className="flex items-center space-x-3 px-3 py-2 text-primary hover:text-primary/80 hover:bg-white/10 transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                <Play className="h-5 w-5" />
+                <span>En Direct</span>
+              </Link>
             </div>
           </div>
         )}
