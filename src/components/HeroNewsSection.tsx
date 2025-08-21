@@ -1,5 +1,5 @@
 
-import { useWordPressArticles, useWordPressCategories } from '@/hooks/useWordPressArticles';
+import { useWordPressArticlesByCategory, useWordPressCategories } from '@/hooks/useWordPressArticles';
 import { Card } from '@/components/ui/card';
 import { Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -8,8 +8,11 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Loader2 } from 'lucide-react';
 
 const HeroNewsSection = () => {
-  const { data: articles, isLoading, error } = useWordPressArticles(8);
   const { data: categories } = useWordPressCategories();
+  
+  // Trouver la catégorie "Sécurité" (ID 3 d'après les requêtes réseau)
+  const securityCategory = categories?.find(cat => cat.id === 3);
+  const { data: articles, isLoading, error } = useWordPressArticlesByCategory(3, 8);
 
   // Function to get category name by ID
   const getCategoryName = (categoryIds: number[]): string => {

@@ -5,6 +5,7 @@ import HeroNewsSection from '../components/HeroNewsSection';
 import CategorySection from '../components/CategorySection';
 import Footer from '../components/Footer';
 import FixedRadioPlayer from '../components/FixedRadioPlayer';
+import BreakingNewsBanner from '../components/BreakingNewsBanner';
 import { useWordPressCategories } from '@/hooks/useWordPressArticles';
 
 const Index = () => {
@@ -16,6 +17,7 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Navigation />
+      <BreakingNewsBanner />
       <main className="pb-[50px]">
         <HeroSection />
         <HeroNewsSection />
