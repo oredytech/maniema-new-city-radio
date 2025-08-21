@@ -18,10 +18,14 @@ const CategorySection = ({ categoryId, categoryName, categorySlug }: CategorySec
     return (
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              <span className="text-gradient">{categoryName}</span>
-            </h2>
+          <div className="flex items-center mb-8">
+            <div className="relative">
+              <div className="bg-primary px-6 py-3 text-primary-foreground font-bold text-xl uppercase transform skew-x-12">
+                <span className="transform -skew-x-12 block">{categoryName}</span>
+              </div>
+              <div className="h-1 bg-primary ml-2 flex-1"></div>
+            </div>
+            <div className="h-1 bg-primary flex-1 ml-4"></div>
           </div>
           
           <div className="flex justify-center">
@@ -39,13 +43,13 @@ const CategorySection = ({ categoryId, categoryName, categorySlug }: CategorySec
   return (
     <section className="py-12 bg-muted/20">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            <span className="text-gradient">{categoryName}</span>
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            Les dernières actualités de la catégorie {categoryName.toLowerCase()}
-          </p>
+        <div className="flex items-center mb-8">
+          <div className="relative">
+            <div className="bg-primary px-6 py-3 text-primary-foreground font-bold text-xl uppercase transform skew-x-12">
+              <span className="transform -skew-x-12 block">{categoryName}</span>
+            </div>
+          </div>
+          <div className="h-1 bg-primary flex-1 ml-4"></div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">

@@ -1,5 +1,5 @@
 
-import { useWordPressArticles } from '@/hooks/useWordPressArticles';
+import { useWordPressArticles, useWordPressCategories } from '@/hooks/useWordPressArticles';
 import { Card } from '@/components/ui/card';
 import { Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -9,6 +9,15 @@ import { Loader2 } from 'lucide-react';
 
 const HeroNewsSection = () => {
   const { data: articles, isLoading, error } = useWordPressArticles(8);
+  const { data: categories } = useWordPressCategories();
+
+  // Function to get category name by ID
+  const getCategoryName = (categoryIds: number[]): string => {
+    if (!categories || !categoryIds || categoryIds.length === 0) return 'ACTUALITÉS';
+    
+    const category = categories.find(cat => categoryIds.includes(cat.id));
+    return category ? category.name.toUpperCase() : 'ACTUALITÉS';
+  };
 
   if (isLoading) {
     return (
@@ -38,6 +47,7 @@ const HeroNewsSection = () => {
   const ArticleCard = ({ article, isLarge = false }: { article: any, isLarge?: boolean }) => {
     const featuredImage = article._embedded?.['wp:featuredmedia']?.[0]?.source_url;
     const altText = article._embedded?.['wp:featuredmedia']?.[0]?.alt_text || article.title.rendered;
+    const categoryName = getCategoryName(article.categories);
     
     return (
       <Link to={`/article/${article.slug}`} className="block h-full">
@@ -60,7 +70,7 @@ const HeroNewsSection = () => {
               {/* Badge catégorie */}
               <div className="mb-2">
                 <span className="bg-primary text-primary-foreground px-3 py-1 rounded text-xs font-bold uppercase">
-                  TOTALEMENT SPORT
+                  {categoryName}
                 </span>
               </div>
               
