@@ -1,7 +1,7 @@
 
 import Navigation from '../components/Navigation';
 import HeroSection from '../components/HeroSection';
-import NewsSection from '../components/NewsSection';
+import HeroNewsSection from '../components/HeroNewsSection';
 import CategorySection from '../components/CategorySection';
 import Footer from '../components/Footer';
 import FixedRadioPlayer from '../components/FixedRadioPlayer';
@@ -18,7 +18,7 @@ const Index = () => {
       <Navigation />
       <main className="pb-[50px]">
         <HeroSection />
-        <NewsSection />
+        <HeroNewsSection />
         
         {/* Sections par catégorie */}
         {topCategories.map((category, index) => (
